@@ -306,4 +306,30 @@ def configure_nemo_streaming(asr_model: Any) -> None:
     except Exception as e:
         log.warning("Could not set att_context_size on model: %s "
                     "(model may not be a cache-aware streaming model)", e)
+
+    # Force single-sequence greedy decoding because batched greedy decoding
+    # does not support `partial_hypotheses` which is required for streaming.
+    try:
+        from nemo.collections.asr.parts.submodules.rnnt_greedy_decoding import (
+            GreedyBatchedRNNTInfer,
+            GreedyRNNTInfer,
+        )
+        if hasattr(asr_model, 'decoding') and hasattr(asr_model.decoding, 'decoding'):
+            current_dec = asr_model.decoding.decoding
+            if isinstance(current_dec, GreedyBatchedRNNTInfer):
+                log.info("Switching NeMo decoding strategy from GreedyBatchedRNNTInfer to GreedyRNNTInfer to support partial_hypotheses")
+                new_dec = GreedyRNNTInfer(
+                    decoder_model=current_dec.decoder,
+                    joint_model=current_dec.joint,
+                    blank_index=current_dec._blank_index,
+                    max_symbols_per_step=current_dec.max_symbols,
+                    preserve_alignments=current_dec.preserve_alignments,
+                    preserve_frame_confidence=current_dec.preserve_frame_confidence,
+                    confidence_method_cfg=getattr(current_dec, 'confidence_method_cfg', None),
+                )
+                asr_model.decoding.decoding = new_dec
+                asr_model.decoding.cfg.strategy = 'greedy'
+    except Exception as e:
+        log.warning("Could not force GreedyRNNTInfer strategy: %s", e)
+
     asr_model.eval()

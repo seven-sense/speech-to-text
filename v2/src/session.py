@@ -306,8 +306,20 @@ class Session:
             except Exception:
                 log.exception("GoogleSTTStream setup failed; falling back")
 
-        # Gemini Live
-        if backend.name == "gemini":
+        # Gemini Live — only true Live API model IDs support bidiGenerateContent.
+        # Batch model IDs (e.g. gemini-2.5-flash, gemini-2.5-pro) must fall
+        # through to ChunkedASRStream below.
+        _live_ids = {
+            "gemini-2.0-flash-live-001",
+            "gemini-live-2.5-flash-preview",
+            "gemini-live-2.0-flash-preview-04-09",
+            "gemini-2.0-flash-live",
+        }
+        _is_live = (
+            backend.model_name in _live_ids
+            or "live" in backend.model_name.lower()
+        )
+        if backend.name == "gemini" and _is_live:
             try:
                 from .asr_streams import GeminiLiveStream
                 log.info("Using GeminiLiveStream for %s/%s",
@@ -321,6 +333,7 @@ class Session:
                 )
             except Exception:
                 log.exception("GeminiLiveStream setup failed; falling back")
+
 
         # Default: chunked adapter (Qwen, Whisper, NeMo offline, etc.).
         # Per-backend tuning: each ASR family has a sweet-spot window where

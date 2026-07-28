@@ -90,7 +90,7 @@ class GoogleSTTStream:
 
         log.info("GoogleSTTStream ready (project=%s, location=%s, model=%s)",
                  self.project_id, self.location, self.model)
-        print(f"✓ Using Google Cloud STT (streaming, model: {self.model})")
+        print(f"[OK] Using Google Cloud STT (streaming, model: {self.model})")
 
     # ── Protocol ────────────────────────────────────────────────────────
 

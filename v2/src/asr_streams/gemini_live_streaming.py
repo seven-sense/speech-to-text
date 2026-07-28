@@ -77,7 +77,7 @@ class GeminiLiveStream:
         self.name = "gemini-live"
         log.info("GeminiLiveStream ready (model=%s, lang=%s)",
                  self.model, self.language or "auto")
-        print(f"✓ Using Gemini Live (streaming, model: {self.model})")
+        print(f"[OK] Using Gemini Live (streaming, model: {self.model})")
 
     # ── Protocol ────────────────────────────────────────────────────────
 
@@ -194,7 +194,6 @@ class GeminiLiveStream:
         self._utterance_samples = 0
         self._running_text = ""
         self._emissions_queue = asyncio.Queue()
-        self._stream_active = True
 
         # The genai live API uses async context managers — we hold the
         # context object so we can close it on end_utterance.
@@ -202,6 +201,7 @@ class GeminiLiveStream:
             model=self.model, config=config,
         )
         self._session = await self._session_ctx.__aenter__()
+        self._stream_active = True
 
         self._receive_task = asyncio.create_task(self._receive_loop())
 
@@ -223,6 +223,18 @@ class GeminiLiveStream:
                     self._emissions_queue.put_nowait(em)
         except asyncio.CancelledError:
             pass
-        except Exception:
-            log.exception("GeminiLiveStream %s receive loop error",
-                          self._utterance_id)
+        except Exception as exc:
+            # Error codes 1000 (OK) and 1006 (abnormal close) mean the server
+            # ended the session. Treat as a graceful stream end (not a crash).
+            err_str = str(exc)
+            if "1000" in err_str or "1006" in err_str:
+                log.debug("GeminiLiveStream %s session closed by server (%s)",
+                          self._utterance_id, err_str.split(".")[0])
+            else:
+                log.exception("GeminiLiveStream %s receive loop error",
+                              self._utterance_id)
+        finally:
+            # Always reset stream state so the next feed() opens a new session
+            self._stream_active = False
+            self._session = None
+            self._session_ctx = None

@@ -68,9 +68,9 @@ class BatchTranscriber(BaseTranscriber):
 
         log.info("Batch session end — segments=%d output=%s",
                  len(transcripts), output_path)
-        print(f"\n✓ Done! Transcribed {len(transcripts)} segment(s) "
+        print(f"\n[OK] Done! Transcribed {len(transcripts)} segment(s) "
               f"with {self.asr_backend.name.upper()}")
-        print(f"✓ Saved to: {output_path}")
+        print(f"[OK] Saved to: {output_path}")
         return transcripts
 
     def _transcribe_segment_or_window(self, audio_data, offset: float = 0.0) -> list[dict]:

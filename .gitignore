@@ -1,0 +1,41 @@
+# Python Virtual Environments
+venv/
+.venv/
+env/
+v2/venv/
+
+# Python Cache and Compiled Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+v2/src/asr_backends/__pycache__/
+v2/src/asr_streams/__pycache__/
+v2/src/__pycache__/
+
+# Local Environment/Credential Files
+.env
+.env.local
+*.env
+v2/.env
+
+# User Audio & Output Directories
+audio.mp3
+**/audio/web_*.mp3
+**/audio/web_*.wav
+**/audio/*.mp3
+**/audio/*.wav
+**/transcripts/web_*.txt
+**/transcripts/realtime_*.txt
+**/transcripts/*.txt
+v2/transcript.txt
+stt_logs/
+logs/
+reports/
+benchmark_cache/
+
+# IDE and OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

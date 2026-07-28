@@ -67,7 +67,7 @@ def detect_silence(audio_data, threshold=0.01):
     Args:
         audio_data: Numpy array of audio samples
         threshold: RMS threshold for silence
-
+ 
     Returns:
         True if silence detected
     """

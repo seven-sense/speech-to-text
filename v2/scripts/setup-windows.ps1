@@ -1,6 +1,6 @@
 # One-shot setup for Windows 10/11.
 # Run from PowerShell. Requires administrator on first run for choco install.
-# Idempotent — safe to re-run.
+# Idempotent - safe to re-run.
 
 $ErrorActionPreference = "Stop"
 
@@ -25,8 +25,8 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 
 # 3. Python venv
 if (-not (Test-Path "venv")) {
-    Write-Host "==> Creating venv with py -3.11" -ForegroundColor Cyan
-    py -3.11 -m venv venv
+    Write-Host "==> Creating venv with python -m venv" -ForegroundColor Cyan
+    python -m venv venv
 }
 
 # 4. Activate + install Python deps
@@ -34,11 +34,11 @@ Write-Host "==> Installing Python dependencies" -ForegroundColor Cyan
 . .\venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 
-# 4a. Optional CUDA torch — only if nvidia-smi is on PATH
+# 4a. Optional CUDA torch - only if nvidia-smi is on PATH
 if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) {
-    Write-Host "==> NVIDIA driver detected — installing CUDA-enabled torch first" -ForegroundColor Cyan
+    Write-Host "==> NVIDIA driver detected - installing CUDA-enabled torch first" -ForegroundColor Cyan
     try {
-        pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu121
+        pip install torch==2.4.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cu121
     } catch {
         Write-Host "==> CUDA torch install failed, continuing with default wheel" -ForegroundColor Yellow
     }
@@ -46,7 +46,7 @@ if (Get-Command nvidia-smi -ErrorAction SilentlyContinue) {
 
 pip install -r requirements.txt
 
-# 5. .env scaffold (HF_TOKEN is optional — only needed for gated HF models)
+# 5. .env scaffold (HF_TOKEN is optional - only needed for gated HF models)
 if (-not (Test-Path ".env")) {
     if (Test-Path ".env.example") {
         Copy-Item ".env.example" ".env"
@@ -64,4 +64,4 @@ Write-Host ""
 Write-Host "Setup complete. Activate the venv with:" -ForegroundColor Green
 Write-Host "  .\venv\Scripts\Activate.ps1"
 Write-Host "Then run:"
-Write-Host "  python main.py realtime"
+Write-Host "  python main.py serve"

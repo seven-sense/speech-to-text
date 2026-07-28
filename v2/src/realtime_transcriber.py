@@ -334,7 +334,7 @@ class RealtimeTranscriber(BaseTranscriber):
                 if parts:
                     log.info("Recording saved: %d part(s), last: %s",
                              len(parts), last_part)
-                    print(f"✓ Recording saved: {len(parts)} part(s) "
+                    print(f"[OK] Recording saved: {len(parts)} part(s) "
                           f"in {self.config.recording_dir}")
             except Exception:
                 log.exception("Recorder close failed")
@@ -345,8 +345,8 @@ class RealtimeTranscriber(BaseTranscriber):
             self.transcript_file.write(f"Ended: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             self.transcript_file.close()
             log.info("Transcript saved: %s", self.transcript_path)
-            print(f"\n✓ Transcript saved to: {self.transcript_path}")
+            print(f"\n[OK] Transcript saved to: {self.transcript_path}")
 
         log.info("Realtime session end — total segments=%d", len(self.transcript_log))
-        print(f"✓ Total segments: {len(self.transcript_log)}")
+        print(f"[OK] Total segments: {len(self.transcript_log)}")
         print("\nGoodbye!")

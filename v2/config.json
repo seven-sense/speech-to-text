@@ -26,15 +26,16 @@
     },
     "gemini": {
       "realtime": "gemini-2.0-flash-live-001",
-      "batch": "gemini-2.5-pro",
+      "batch": "gemini-2.5-flash",
       "language": "English",
-      "_note": "Live models (true streaming) are the *-live-* / *-native-audio-* model IDs. Non-Live ids (gemini-2.5-flash, etc.) fall back to chunked-streaming-UX via the GeminiASRBackend.",
+      "_note": "Live models use bidiGenerateContent WebSocket (true streaming). Only *-live-* model IDs support this. Batch model IDs (gemini-2.5-flash, gemini-2.5-pro) use ChunkedASRStream instead.",
+      "_live_models": ["gemini-2.0-flash-live-001", "gemini-live-2.5-flash-preview"],
       "available": {
-        "gemini-2.0-flash-live-001": "Live API (true streaming, ~300ms first-word)",
-        "gemini-2.5-flash-preview-native-audio-dialog": "Live API — newest, native audio",
-        "gemini-2.5-flash": "Batch (chunked over batch — slower interim)",
+        "gemini-2.0-flash-live-001": "Live API — stable, official Live model (recommended)",
+        "gemini-live-2.5-flash-preview": "Live API — Gemini 2.5 Flash Live preview (may require waitlist)",
+        "gemini-2.5-flash": "Batch (chunked over REST — lower latency than pro)",
         "gemini-2.5-pro": "Batch — highest quality, slowest",
-        "gemini-2.0-flash": "Batch — older fast model"
+        "gemini-2.0-flash": "Batch — fast, cheaper"
       }
     },
     "google-stt": {

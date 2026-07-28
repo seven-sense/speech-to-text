@@ -66,14 +66,14 @@ class NemoASRBackend(ASRBackend):
         if device == 'cuda':
             self.model = self.model.cuda()
             log.info("NeMo ASR running on CUDA GPU")
-            print("✓ Using CUDA GPU for NeMo ASR")
+            print("[OK] Using CUDA GPU for NeMo ASR")
         elif device == 'mps':
             self.model = self.model.to('mps')
             log.info("NeMo ASR running on MPS")
-            print("✓ Using MPS (Apple Silicon) for NeMo ASR")
+            print("[OK] Using MPS (Apple Silicon) for NeMo ASR")
         else:
             log.info("NeMo ASR running on CPU (slow)")
-            print("✓ Using CPU for NeMo ASR (slower)")
+            print("[OK] Using CPU for NeMo ASR (slower)")
 
     def transcribe(self, audio_data: np.ndarray) -> str:
         if len(audio_data) == 0:
@@ -152,13 +152,13 @@ class QwenASRBackend(ASRBackend):
 
         if device == 'cuda':
             log.info("Qwen3-ASR running on CUDA GPU")
-            print("✓ Using CUDA GPU for Qwen3-ASR")
+            print("[OK] Using CUDA GPU for Qwen3-ASR")
         elif device == 'mps':
             log.info("Qwen3-ASR running on MPS")
-            print("✓ Using MPS (Apple Silicon) for Qwen3-ASR")
+            print("[OK] Using MPS (Apple Silicon) for Qwen3-ASR")
         else:
             log.info("Qwen3-ASR running on CPU")
-            print("✓ Using CPU for Qwen3-ASR")
+            print("[OK] Using CPU for Qwen3-ASR")
 
     def transcribe(self, audio_data: np.ndarray) -> str:
         if len(audio_data) == 0:
@@ -242,15 +242,15 @@ class WhisperASRBackend(ASRBackend):
 
         if device == "cuda":
             log.info("Whisper running on CUDA GPU")
-            print("✓ Using CUDA GPU for Whisper")
+            print("[OK] Using CUDA GPU for Whisper")
         elif device == "mps":
             # We told CT2 cpu — log honestly so the user knows.
             log.info("Whisper running on CPU (CTranslate2 has no MPS support)")
-            print("✓ Using CPU for Whisper "
+            print("[OK] Using CPU for Whisper "
                   "(CTranslate2 has no Apple-Silicon MPS backend)")
         else:
             log.info("Whisper running on CPU")
-            print("✓ Using CPU for Whisper")
+            print("[OK] Using CPU for Whisper")
 
     def transcribe(self, audio_data: np.ndarray) -> str:
         if len(audio_data) == 0:
@@ -323,7 +323,7 @@ class GeminiASRBackend(ASRBackend):
 
         log.info("Gemini ASR ready (model=%s, lang=%s)",
                  model_name, language or "auto")
-        print(f"✓ Using Gemini API for ASR (model: {model_name})")
+        print(f"[OK] Using Gemini API for ASR (model: {model_name})")
 
     @staticmethod
     def _pcm_float32_to_wav_bytes(pcm: np.ndarray, sample_rate: int) -> bytes:
@@ -457,7 +457,7 @@ class GoogleSTTBackend(ASRBackend):
             "Google Cloud STT ready (model=%s, location=%s, project=%s, langs=%s)",
             model_name, location, project_id, ",".join(self.language_codes),
         )
-        print(f"✓ Using Google Cloud STT (model: {model_name}, location: {location})")
+        print(f"[OK] Using Google Cloud STT (model: {model_name}, location: {location})")
 
     @staticmethod
     def _pcm_float32_to_linear16(pcm: np.ndarray) -> bytes:

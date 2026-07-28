@@ -61,7 +61,7 @@ class BaseTranscriber:
             "whisper": "Whisper",
         }.get(self.asr_backend.name, self.asr_backend.name)
         log.info("Transcriber ready — ASR only (%s)", backend_label)
-        print(f"✓ ASR ready ({backend_label})\n")
+        print(f"[OK] ASR ready ({backend_label})\n")
 
     def transcribe_segment(self, audio_data):
         return self.asr_backend.transcribe(audio_data)

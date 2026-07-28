@@ -28,8 +28,8 @@ def _init_logging():
 _init_logging()
 log = get_logger(__name__)
 
-from src.realtime_transcriber import RealtimeTranscriber  # noqa: E402
-from src.batch_transcriber import BatchTranscriber  # noqa: E402
+
+
 
 
 def _backend_label(config):
@@ -46,6 +46,7 @@ def _backend_label(config):
 
 def realtime_mode(args):
     """Run real-time transcription mode."""
+    from src.realtime_transcriber import RealtimeTranscriber
     config = get_config()
     print(f"Starting real-time transcription with {_backend_label(config)}...")
 
@@ -64,9 +65,9 @@ def serve_mode(args):
     # Always point users at the literal URL that works.
     print()
     print("=" * 70)
-    print(f"  ➜  Open this URL in your browser:  http://localhost:{args.port}")
+    print(f"  --> Open this URL in your browser:  http://localhost:{args.port}")
     print("=" * 70)
-    print("  ⚠ Use 'localhost' literally. Don't paste 'http://0.0.0.0:...' from")
+    print("  [WARN] Use 'localhost' literally. Don't paste 'http://0.0.0.0:...' from")
     print("    the uvicorn startup line below — browsers block mic access on")
     print("    non-secure origins (0.0.0.0, LAN IPs, etc.).")
     print("=" * 70)
@@ -79,6 +80,7 @@ def serve_mode(args):
 
 def batch_mode(args):
     """Run batch transcription mode."""
+    from src.batch_transcriber import BatchTranscriber
     audio_file = Path(args.audio_file)
 
     if not audio_file.exists():
@@ -174,11 +176,11 @@ def benchmark_mode(args):
     write_markdown_gap_assessment(results, output_md, meta=meta)
 
     print()
-    print(f"✓ JSON report:     {output_json}")
-    print(f"✓ Markdown report: {output_md}")
+    print(f"[OK] JSON report:     {output_json}")
+    print(f"[OK] Markdown report: {output_md}")
     if results:
         mean_wer = sum(r.wer for r in results) / len(results)
-        print(f"✓ Mean WER over {len(results)} samples: {mean_wer:.4f}")
+        print(f"[OK] Mean WER over {len(results)} samples: {mean_wer:.4f}")
 
 
 def verify_setup():
@@ -189,7 +191,7 @@ def verify_setup():
     try:
         # Check config
         config = get_config()
-        print("✓ Configuration loaded")
+        print("[OK] Configuration loaded")
         if config.hf_token:
             print(f"  - HF Token: {'*' * min(len(config.hf_token), 20)}... (set)")
         else:
@@ -202,41 +204,41 @@ def verify_setup():
         else:
             print(f"  - NeMo ASR (realtime): {config.nemo_realtime_model}")
             print(f"  - NeMo ASR (batch): {config.nemo_batch_model}")
-        print(f"  - NeMo VAD: {config.nemo_vad_model}")
-        print(f"  - NeMo Speaker: {config.nemo_speaker_model}")
+        print(f"  - NeMo VAD: {getattr(config, 'nemo_vad_model', 'N/A')}")
+        print(f"  - NeMo Speaker: {getattr(config, 'nemo_speaker_model', 'N/A')}")
         print()
 
         # Check dependencies
         print("Checking dependencies...")
         import numpy
-        print("  ✓ numpy")
+        print("  [OK] numpy")
         import torch
-        print("  ✓ torch")
+        print("  [OK] torch")
         import pydub
-        print("  ✓ pydub")
+        print("  [OK] pydub")
         import nemo.collections.asr as nemo_asr
-        print("  ✓ nemo_toolkit[asr]")
+        print("  [OK] nemo_toolkit[asr]")
         from sklearn.cluster import SpectralClustering
-        print("  ✓ scikit-learn")
+        print("  [OK] scikit-learn")
         import sounddevice
-        print("  ✓ sounddevice")
+        print("  [OK] sounddevice")
         import dotenv
-        print("  ✓ python-dotenv")
+        print("  [OK] python-dotenv")
         print()
 
         # Check PyTorch device
         if torch.cuda.is_available():
-            print(f"✓ CUDA available: {torch.cuda.get_device_name(0)}")
+            print(f"[OK] CUDA available: {torch.cuda.get_device_name(0)}")
         elif torch.backends.mps.is_available():
-            print("✓ MPS (Apple Silicon) available")
+            print("[OK] MPS (Apple Silicon) available")
         else:
-            print("✓ CPU only (consider GPU for faster processing)")
+            print("[OK] CPU only (consider GPU for faster processing)")
         print()
 
         # Check audio devices (non-fatal — containers/headless hosts have no mic)
         try:
             devices = sounddevice.query_devices()
-            print(f"✓ Found {len(devices)} audio device(s)")
+            print(f"[OK] Found {len(devices)} audio device(s)")
             try:
                 default_input = sounddevice.query_devices(kind='input')
                 print(f"  - Default input: {default_input['name']}")
@@ -244,7 +246,7 @@ def verify_setup():
                 print("  - No default input device (realtime mic mode unavailable; "
                       "batch mode still works)")
         except Exception as e:
-            print(f"⚠ No audio devices accessible: {e}")
+            print(f"[WARN] No audio devices accessible: {e}")
             print("  Realtime mic mode will not work here. Batch mode is unaffected.")
             print("  (Common in Docker on Mac/Windows, or on headless servers.)")
         print()
@@ -259,15 +261,15 @@ def verify_setup():
                 timeout=5
             )
             if result.returncode == 0:
-                print("✓ FFmpeg installed")
+                print("[OK] FFmpeg installed")
             else:
-                print("✗ FFmpeg not found (required for audio processing)")
+                print("[FAIL] FFmpeg not found (required for audio processing)")
         except FileNotFoundError:
-            print("✗ FFmpeg not found (install with: brew install ffmpeg)")
+            print("[FAIL] FFmpeg not found (install with: brew install ffmpeg)")
         print()
 
         print("=" * 60)
-        print("✓ Setup verification complete!")
+        print("[OK] Setup verification complete!")
         print("=" * 60)
         print()
         print("Quick start:")
@@ -278,7 +280,7 @@ def verify_setup():
         return 0
 
     except Exception as e:
-        print(f"\n✗ Setup verification failed: {e}")
+        print(f"\n[FAIL] Setup verification failed: {e}")
         print("\nPlease ensure:")
         print("  1. All dependencies installed: pip install -r requirements.txt")
         print("  2. FFmpeg installed: brew install ffmpeg (Mac) / apt install ffmpeg (Linux)")
